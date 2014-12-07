@@ -19,14 +19,12 @@ EntryWidget::~EntryWidget()
 void EntryWidget::on_drawButton_clicked()
 {
     int n;
-    double angle, l, kl, kx, ky;
+    double l;
     n = this->ui->repititionsInput->value();
-    angle = qDegreesToRadians(this->ui->angleInput->value());
+    this->angle = (this->ui->angleInput->value() / 2);
     l = this->ui->lengthInput->value();
-    kl = this->ui->multiplierInput->value();
-    kx = qSin(angle / 2);
-    ky = qCos(angle / 2);
-    this->step(n, 0, 0, l, kx, ky, kl);
+    this->k = this->ui->multiplierInput->value();
+    this->step(n, 0, 0, l, 90);
 }
 
 void EntryWidget::on_exitButton_clicked()
@@ -39,18 +37,25 @@ void EntryWidget::on_clearButton_clicked()
     this->scene->clear();
 }
 
-void EntryWidget::step(const int &n, const double &x, const double &y, const double &l, const double &kx, const double &ky, const double &kl)
+void EntryWidget::step(const int &n, const double &x, const double &y, const double &l, const double &angle)
 {
     if(n > 0){
-        double dx, dy, nx1, nx2, ny;
-        dx = l * kx;
-        dy = l * ky;
-        nx1 = x + dx;
-        nx2 = x - dx;
-        ny = y - dy;
-        this->scene->addLine(x, y, nx1, ny);
-        this->scene->addLine(x, y, nx2, ny);
-        this->step(n-1, nx1, ny, l * kl, kx, ky, kl);
-        this->step(n-1, nx2, ny, l * kl, kx, ky, kl);
+        QLineF* line1 = new QLineF(x, y, x, y - l);
+        QLineF* line2 = new QLineF(x, y, x, y - l);
+        line1->setAngle(angle + this->angle);
+        line2->setAngle(angle - this->angle);
+        qreal lx, ly, langle, rx, ry, rangle;
+        lx = line1->x2();
+        ly = line1->y2();
+        langle = line1->angle();
+        rx = line2->x2();
+        ry = line2->y2();
+        rangle = line2->angle();
+        delete line1;
+        delete line2;
+        this->scene->addLine(x, y, lx, ly);
+        this->scene->addLine(x, y, rx, ry);
+        this->step(n-1, lx, ly, l * this->k, langle);
+        this->step(n-1, rx, ry, l * this->k, rangle);
     }
 }

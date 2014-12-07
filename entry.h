@@ -26,7 +26,9 @@ private slots:
 private:
     Ui::Widget *ui;
     QGraphicsScene *scene;
-    void step(const int &n, const double &x, const double &y, const double &l, const double &kx, const double &ky, const double &kl);
+    double k = 0.8;
+    double angle = 60.0;
+    void step(const int &n, const double &x, const double &y, const double &l, const double &angle);
 };
 
 #endif // ENTRY_H
